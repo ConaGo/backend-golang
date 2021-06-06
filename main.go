@@ -2,28 +2,19 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"conago.de/myutil"
-	"conago.de/web-scraper/html_parser"
+	//"conago.de/web-scraper/html_parser"
+	//"conago.de/web-scraper/data_parser"
+	"conago.de/web-scraper/server"
 
 	"github.com/gocolly/colly/v2"
-	"gorm.io/gorm"
 )
-type Conference struct {
-	gorm.Model
-	Name string
-	Url string
-	StartDate time.Time
-	EndDate time.Time
-	City string
-	Country string
-	Online bool
-	Twitter string
-	Tags [] string
-}
 func main() {
-	html_parser.Test()
+	//html_parser.Test()
+	//data_parser.ParseData()
+	server.Test()
+
 }
 
 func secondary() {

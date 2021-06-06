@@ -3,8 +3,8 @@ package html_parser
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
 
 	"golang.org/x/net/html"
 )
@@ -18,19 +18,18 @@ type HTMLMeta struct {
 	OGPublisher   string
 	OGSiteName    string
 }
-func Test() {
-	response, err := http.Get("https://halfstackconf.com/phoenix")
+func GetHTMLMeta(url string) HTMLMeta{
+	response, err := http.Get(url)
+	var hm HTMLMeta
 	if err != nil {
-		fmt.Printf("%s", err)
-		os.Exit(1)
+		log.Printf("Error getting HTML from url %s ::ERROR:: %s", url, err)
 	} else {
 		defer response.Body.Close()
-		meta := ExtractMetaData(response.Body)
-		fmt.Println(meta.OGTitle) // print the open graph title
-		fmt.Println(meta.OGImage) // print the open graph image
+		hm = extractMetaData(response.Body)
 	}
+	return hm
 }
-func ExtractMetaData(resp io.Reader) (hm HTMLMeta) {
+func extractMetaData(resp io.Reader) (hm HTMLMeta) {
 	z := html.NewTokenizer(resp)
 
 	titleFound := false
@@ -97,7 +96,6 @@ func extractMetaProperty(t html.Token, prop string) (content string, ok bool) {
 		if attr.Key == "property" && attr.Val == prop {
 			ok = true
 		}
-
 		if attr.Key == "content" {
 			content = attr.Val
 		}

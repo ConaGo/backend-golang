@@ -11,11 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"conago.de/web-scraper/html_parser"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 type Conference struct {
 	gorm.Model
+	//UUID uuid.UUID `gorm:"primaryKey"`
 	Name string
 	Url string
 	StartDate time.Time
@@ -24,26 +26,70 @@ type Conference struct {
 	Country string
 	Online bool
 	Twitter string
-	Tags [] string
+	Tags []Tag `gorm:"many2many:conference_tags;"`
+	Metadata html_parser.HTMLMeta `gorm:"embedded"`
 }
-func main2(){
-	_, err := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
+type Tag struct {
+	TagID uint `gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	TagName string
+}
+/* func (c *Conference) BeforeCreate(tx *gorm.DB) (err error) {
+	c.UUID = uuid.New()
+	return nil
+  } */
+func ParseData(){
+	db, err := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
 	if err != nil {
 	  panic("failed to connect database")
 	}
-	//db.AutoMigrate(&Conference{})
-	//readConferenceData()
+	db.AutoMigrate(&Conference{})
+	db.AutoMigrate((&Tag{}))
 	datas := convertConferenceData(readConferenceData())
-	fmt.Println(datas)
-	//db.Create(&datas)
-
-/* 	var conferences []Conference
+	db.Create(&datas)
+	//fmt.Println(datas)
+	var conferences []Conference
+	db.Raw("SELECT * FROM tags INNER JOIN conference_tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ? INNER JOIN conferences ON conferences.id = conference_tags.conference_id", "javascript").Scan(&conferences)
+	for _, elem := range conferences {
+		fmt.Println(elem.Name, elem.City)
+	}
+	/* 	var conferences []Conference
 	db.Find(&conferences)
 	for val := range conferences{
 		fmt.Println(val)
 	} */
+	//var tags []Tag
+/* 	var conferences []Conference
+	db.Find(&conferences)
+	for _, elem := range conferences {
+		fmt.Println(elem.Tags)
+	} */
+/* 	var tags []Tag
+	db.Find((&tags))
+	for _, elem := range tags {
+		fmt.Println(elem.Name)
+	} */
+	//db.Where("start_date > ?", time.Now()).Find(&conferences)
+	//db.Where(&Conference{Tags:[]Tag{{Name:"css"}}})
+	
+	//fmt.Println(conferences)
+	type Result struct {
+		Conference_ID int
+		TagName string
+	}
+	//var results []Result
+	
+	//db.Table("conference_tags").Select("conference_tags.conference_id, tags.name").Joins("left join tags on tags.id = conference_tags.tag_id").Scan(&results)
+	//db.Joins("JOIN tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ?", "javascript").Joins("JOIN conferences ON conferences.id = tags.conference_id").Find(&conferences)
+	//db.Joins("conferences").Find(&conferences,"tags")
+	//fmt.Println(conferences)
 }
 // Converts parsed json from "map[string]interface" format to the "Conference" struct
+// Dates get converted to time.Time
+// Tags get converted from string to array of "Tag"-structs
+// html_parser gets called to populate HTMLMetadata
 func convertConferenceData(d []map[string]interface{}) []Conference{
 	var confs []Conference
 	const( layoutISO = "2006-01-02")
@@ -57,7 +103,7 @@ func convertConferenceData(d []map[string]interface{}) []Conference{
 			Country: "",
 			Online: false,
 			Twitter: "",
-			Tags: []string{},
+			Tags: []Tag{},
 		}
 		for key := range data {
 			switch key{
@@ -82,10 +128,13 @@ func convertConferenceData(d []map[string]interface{}) []Conference{
 			case "twitter":
 				c.Twitter = reflect.ValueOf(data["twitter"]).String()
 			case "tags":
-				c.Tags = strings.Fields(reflect.ValueOf(data["twitter"]).String())
+				for _, el := range strings.Fields(reflect.ValueOf(data["tags"]).String()){
+					c.Tags = append(c.Tags, Tag{TagName:el})
+				}
 			}
 			
 		}
+		c.Metadata = html_parser.GetHTMLMeta(c.Url)
 		confs = append(confs, c)
 	}
 	return confs
