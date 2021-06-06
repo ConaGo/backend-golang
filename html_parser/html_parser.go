@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/net/html"
 )
+
 type HTMLMeta struct {
 	Title         string
 	Description   string
@@ -18,7 +19,8 @@ type HTMLMeta struct {
 	OGPublisher   string
 	OGSiteName    string
 }
-func GetHTMLMeta(url string) HTMLMeta{
+
+func GetHTMLMeta(url string) HTMLMeta {
 	response, err := http.Get(url)
 	var hm HTMLMeta
 	if err != nil {
@@ -46,16 +48,12 @@ func extractMetaData(resp io.Reader) (hm HTMLMeta) {
 			}
 			if t.Data == "meta" {
 				fmt.Println(t.Attr)
-				desc, ok := extractMetaProperty(t, "description")
-				if ok {
+				if desc, ok := extractMetaProperty(t, "description"); ok {
 					hm.Description = desc
 				}
-
-				ogTitle, ok := extractMetaProperty(t, "og:title")
-				if ok {
+				if ogTitle, ok := extractMetaProperty(t, "og:title"); ok {
 					hm.OGTitle = ogTitle
 				}
-
 				ogDesc, ok := extractMetaProperty(t, "og:description")
 				if ok {
 					hm.OGDescription = ogDesc
@@ -88,7 +86,7 @@ func extractMetaData(resp io.Reader) (hm HTMLMeta) {
 				titleFound = false
 			}
 		}
-		
+
 	}
 }
 func extractMetaProperty(t html.Token, prop string) (content string, ok bool) {
