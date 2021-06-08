@@ -1,7 +1,6 @@
 package html_parser
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -47,7 +46,7 @@ func extractMetaData(resp io.Reader) (hm HTMLMeta) {
 				titleFound = true
 			}
 			if t.Data == "meta" {
-				fmt.Println(t.Attr)
+				//fmt.Println(t.Attr)
 				if desc, ok := extractMetaProperty(t, "description"); ok {
 					hm.Description = desc
 				}

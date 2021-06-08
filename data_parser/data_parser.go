@@ -18,8 +18,7 @@ import (
 )
 
 type Conference struct {
-	gorm.Model
-	//UUID uuid.UUID `gorm:"primaryKey"`
+	gorm.Model	`json:"-"`
 	Name      string               //`json:"name"`
 	Url       string               //`json:"url"`
 	StartDate JSONDate             //`json:"startDate"`
@@ -60,9 +59,13 @@ func (me *JSONDate) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-
 	*me = JSONDate(t)
 	return nil
+}
+func (me JSONDate) MarshalJSON() ([]byte, error) {
+	t := time.Time(me)
+	stamp := fmt.Sprintf("\"%v-%v-%v\"",t.Year(), t.Month(), t.Day() )
+    return []byte(stamp), nil
 }
 
 func (me JSONDate) String() string {
@@ -70,11 +73,9 @@ func (me JSONDate) String() string {
 }
 
 type Tag struct {
-	TagID     uint `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-	TagName   string
+	gorm.Model				`json:"-"`
+	TagName   	string
+	Conferences []Conference `gorm:"many2many:conference_tags;"`
 }
 
 /* func (c *Conference) BeforeCreate(tx *gorm.DB) (err error) {
@@ -88,44 +89,12 @@ func ParseData() {
 	}
 	db.AutoMigrate(&Conference{})
 	db.AutoMigrate((&Tag{}))
-	// datas := convertConferenceData(readConferenceData())
 	datas := readConferenceData2()
 	db.Create(&datas)
 	var conferences []Conference
-	db.Raw("SELECT * FROM tags INNER JOIN conference_tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ? INNER JOIN conferences ON conferences.id = conference_tags.conference_id", "javascript").Scan(&conferences)
 	for _, elem := range conferences {
 		fmt.Println(elem.Name, elem.City)
 	}
-	/* 	var conferences []Conference
-	db.Find(&conferences)
-	for val := range conferences{
-		fmt.Println(val)
-	} */
-	//var tags []Tag
-	/* 	var conferences []Conference
-	   	db.Find(&conferences)
-	   	for _, elem := range conferences {
-	   		fmt.Println(elem.Tags)
-	   	} */
-	/* 	var tags []Tag
-	   	db.Find((&tags))
-	   	for _, elem := range tags {
-	   		fmt.Println(elem.Name)
-	   	} */
-	//db.Where("start_date > ?", time.Now()).Find(&conferences)
-	//db.Where(&Conference{Tags:[]Tag{{Name:"css"}}})
-
-	//fmt.Println(conferences)
-	type Result struct {
-		Conference_ID int
-		TagName       string
-	}
-	//var results []Result
-
-	//db.Table("conference_tags").Select("conference_tags.conference_id, tags.name").Joins("left join tags on tags.id = conference_tags.tag_id").Scan(&results)
-	//db.Joins("JOIN tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ?", "javascript").Joins("JOIN conferences ON conferences.id = tags.conference_id").Find(&conferences)
-	//db.Joins("conferences").Find(&conferences,"tags")
-	//fmt.Println(conferences)
 }
 
 // Converts parsed json from "map[string]interface" format to the "Conference" struct
@@ -306,6 +275,7 @@ func readConferenceData2() []*Conference {
 		if shouldAdd {
 			conference.Metadata = html_parser.GetHTMLMeta(conference.Url)
 			filteredConferences = append(filteredConferences, conference)
+			fmt.Println(conference)
 		}
 	}
 	return filteredConferences

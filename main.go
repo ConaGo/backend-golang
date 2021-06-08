@@ -4,8 +4,11 @@ import (
 	"fmt"
 
 	"conago.de/myutil"
-	//"conago.de/web-scraper/html_parser"
 	"conago.de/web-scraper/data_parser"
+	"conago.de/web-scraper/server"
+
+	//"conago.de/web-scraper/html_parser"
+	//"conago.de/web-scraper/data_parser"
 	//"conago.de/web-scraper/server"
 
 	"github.com/gocolly/colly/v2"
@@ -14,7 +17,7 @@ import (
 func main() {
 	//html_parser.Test()
 	data_parser.ParseData()
-	//server.Test()
+	server.Test()
 
 }
 
