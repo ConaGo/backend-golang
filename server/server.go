@@ -6,13 +6,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"conago.de/myutil"
 	"conago.de/web-scraper/data_parser"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
+const (
+	layoutISO = "2006-01-02"
+)
 func Test() {
 /* 	//https://golang.org/pkg/time/#example_Tick
 	t := time.Tick(30 * time.Minute)
@@ -33,29 +36,43 @@ func sanitizeParams(name, value string) error{
 	return errors.New("malformed params")
 }
 func handleIndex(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	//tags := params["tags"]
-	tagParam := params.Get("tag")
+	//CORS - remove 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	fmt.Println(tagParam)
+
+	params := r.URL.Query()
+	tags := params["tag"]
+	date := params.Get("date")
+	fmt.Println(date)
+	t, err := time.Parse(layoutISO, date)
+	dateTime := time.Now()
+	if err == nil {
+		dateTime = t
+	}
 	db, err := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	var conferences []data_parser.Conference
-	if tagParam != "" {
-		//db.Raw("SELECT * FROM tags INNER JOIN conference_tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ? INNER JOIN conferences ON conferences.id = conference_tags.conference_id", tag).Scan(&conferences)
-	}else{
-		//db.Raw("SELECT * FROM tags INNER JOIN conference_tags ON tags.tag_id = conference_tags.tag_tag_id INNER JOIN conferences ON conferences.id = conference_tags.conference_id").Scan(&conferences)
+	conferences := []data_parser.Conference{}
+	if len(tags) == 0 {
+		db.Debug().Preload("Tags").Where("end_date > ?", dateTime).Order("start_date ASC").Find(&conferences)
+	} else {
+		db.Debug().Preload("Tags", "tag_name IN ?", tags).Where("end_date > ?", dateTime).Order("start_date ASC").Find(&conferences)
 	}
-	//db.Model(&data_parser.Conference{}).Joins("left join conference_tags on conferences.id = conference_tags.conference_id").Joins("JOIN tags ON tags.tag_id = conference_tags.tag_tag_id AND tags.tag_name = ?", "javascript").Scan(&conferences)
-	//db.Model(&data_parser.Conference{}).Joins("JOIN tags ON tags.tag_id = conference_tags.tag_tag_id AND conferences.id = conference_tags.conference_id").Scan(&conferences)
-	//db.Preload("Tags").Find(&conferences)
-	tag := []data_parser.Tag{}
-	db.Preload("Tags").Find(&conferences)
-	//db.Where("tag_name IN ?", []string{"javascript", "css", "devops"}).Preload("Conferences").Find(&tag)
-	fmt.Println(tag)
-	b, err := json.Marshal(conferences)
+		
+
+	var _conferences []data_parser.Conference
+	for _, c:= range conferences {
+		if len(c.Tags) > 0 {
+			_conferences = append(_conferences, c)
+		} 
+	}
+	fmt.Println(len(conferences))
+	fmt.Println(len(_conferences))
+
+
+	b, err := json.Marshal(_conferences)
 	if err != nil {
 		log.Println(err)
 		return

@@ -74,7 +74,7 @@ func (me JSONDate) String() string {
 type Tag struct {
 	gorm.Model				`json:"-"`
 	TagName   	string
-	Conferences []Conference `gorm:"many2many:conference_tags;"`
+	Conferences []Conference `gorm:"many2many:conference_tags" json:"-"`
 }
 
 /* func (c *Conference) BeforeCreate(tx *gorm.DB) (err error) {
@@ -108,7 +108,7 @@ func readConferenceData() []*Conference {
 		if info.IsDir() {
 			currentDir = info.Name()
 			fmt.Printf("directory name: %s\n", currentDir)
-		} else if currentDir == "2022" {
+		} else if currentDir == "2022" || currentDir == "2021" {
 			path := rootPath + "/" + currentDir + "/" + info.Name()
 			fmt.Println(path)
 			jsonFile, e := os.Open(path)

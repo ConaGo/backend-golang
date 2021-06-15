@@ -9,14 +9,14 @@ import (
 )
 
 type HTMLMeta struct {
-	Title         string
-	Description   string
-	OGTitle       string
-	OGDescription string
-	OGImage       string
-	OGAuthor      string
-	OGPublisher   string
-	OGSiteName    string
+	Title         string	`json:",omitempty"`
+	Description   string	`json:",omitempty"`
+	OGTitle       string	`json:",omitempty"`
+	OGDescription string	`json:",omitempty"`
+	OGImage       string	`json:",omitempty"`
+	OGAuthor      string	`json:",omitempty"`
+	OGPublisher   string	`json:",omitempty"`
+	OGSiteName    string	`json:",omitempty"`
 }
 
 func GetHTMLMeta(url string) HTMLMeta {

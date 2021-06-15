@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"conago.de/myutil"
-	"conago.de/web-scraper/data_parser"
 	"conago.de/web-scraper/server"
 
 	//"conago.de/web-scraper/html_parser"
@@ -16,7 +15,7 @@ import (
 
 func main() {
 	//html_parser.Test()
-	data_parser.ParseData()
+	//data_parser.ParseData()
 	server.Test()
 
 }
