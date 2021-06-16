@@ -16,7 +16,7 @@ import (
 func main() {
 	//html_parser.Test()
 	//data_parser.ParseData()
-	server.Test()
+	server.Serve()
 
 }
 

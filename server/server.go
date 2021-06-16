@@ -16,13 +16,14 @@ import (
 const (
 	layoutISO = "2006-01-02"
 )
-func Test() {
+func Serve() {
 /* 	//https://golang.org/pkg/time/#example_Tick
 	t := time.Tick(30 * time.Minute)
 	for next := range t {
 		fmt.Printf("%v %s\n", next, statusUpdate())
 	} */
-	http.HandleFunc("/", handleIndex)
+	http.HandleFunc("/conferences", handleConferences)
+	http.HandleFunc("/questions")
 	http.ListenAndServe(":8080", nil)
 }
 func sanitizeParams(name, value string) error{
@@ -35,7 +36,7 @@ func sanitizeParams(name, value string) error{
 	}
 	return errors.New("malformed params")
 }
-func handleIndex(w http.ResponseWriter, r *http.Request) {
+func handleConferences(w http.ResponseWriter, r *http.Request) {
 	//CORS - remove 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -68,10 +69,6 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 			_conferences = append(_conferences, c)
 		} 
 	}
-	fmt.Println(len(conferences))
-	fmt.Println(len(_conferences))
-
-
 	b, err := json.Marshal(_conferences)
 	if err != nil {
 		log.Println(err)
@@ -80,3 +77,4 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(b)
 }
+func 
