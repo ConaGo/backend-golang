@@ -23,7 +23,7 @@ func init() {
         log.Fatal("Failed to init db:", errC)
     }
     ConfDB = DBT{DB: dbC}
-    dbT, errT := gorm.Open(sqlite.Open("../../data/quizToken"), &gorm.Config{})
+    dbT, errT := gorm.Open(sqlite.Open("./data/quizToken"), &gorm.Config{})
     if errT != nil {
         log.Fatal("Failed to init db:", errT)
     }
