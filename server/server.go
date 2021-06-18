@@ -8,6 +8,11 @@ import (
 const (
 	layoutISO = "2006-01-02"
 )
+func StartServer(){
+	http.HandleFunc("/", Serve)
+	http.ListenAndServe(":8080", nil)
+}
+
 func Serve(w http.ResponseWriter, r *http.Request) {
 /* 	//https://golang.org/pkg/time/#example_Tick
 	t := time.Tick(30 * time.Minute)
@@ -24,6 +29,8 @@ func Serve(w http.ResponseWriter, r *http.Request) {
         h = get(HandleConferences)
     case match(p, "/questions"):
         h = get(HandleQuestions)
+    case match(p, "/questions/token"):
+        h = get(HandleTokens)
     default:
         http.NotFound(w, r)
         return

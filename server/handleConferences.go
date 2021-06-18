@@ -54,8 +54,7 @@ func HandleConferences(w http.ResponseWriter, r *http.Request) {
         log.Println(err)
 		return
     }
-	b, err := json.Marshal(conferences)
-	if err != nil {
+	b, err := json.Marshal(conferences); if err != nil {
 		log.Println(err)
 		return
 	}

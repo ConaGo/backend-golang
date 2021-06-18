@@ -1,10 +1,9 @@
-package quiz_scraper
+package server
 
 import (
 	"testing"
 )
 func TestQuery(t *testing.T) {
-	GetQuizzes()
-	//RequestQuiz()
+	Test()
 	
 }

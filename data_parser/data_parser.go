@@ -46,11 +46,9 @@ func (j *JSONDate) Scan(src interface{}) error {
 	}
 	return nil
 }
-
 func (j JSONDate) Value() (driver.Value, error) {
 	return time.Time(j), nil
 }
-
 // https://golang.org/pkg/encoding/json/#Unmarshaler
 func (me *JSONDate) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)

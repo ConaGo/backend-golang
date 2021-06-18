@@ -18,14 +18,14 @@ var TokenDB DBT
 
 //opens two connections to the sqlite databases and exposes the connection
 func init() {
-    dbC, errC := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
+    dbC, errC := gorm.Open(sqlite.Open("../data/test.db"), &gorm.Config{})
     if errC != nil {
-        log.Fatal("Failed to init db:", errC)
+        log.Fatal("Failed to init test db:", errC)
     }
     ConfDB = DBT{DB: dbC}
-    dbT, errT := gorm.Open(sqlite.Open("./data/quizToken"), &gorm.Config{})
+    dbT, errT := gorm.Open(sqlite.Open("../data/quizToken.db"), &gorm.Config{})
     if errT != nil {
-        log.Fatal("Failed to init db:", errT)
+        log.Fatal("Failed to init quizToken db:", errT)
     }
     TokenDB = DBT{DB: dbT}
 }

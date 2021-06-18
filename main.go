@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"conago.de/myutil"
 	"conago.de/web-scraper/server"
@@ -17,8 +16,7 @@ import (
 func main() {
 	//html_parser.Test()
 	//data_parser.ParseData()
-	http.HandleFunc("/", server.Serve)
-	http.ListenAndServe(":8080", nil)
+	server.StartServer()
 
 }
 

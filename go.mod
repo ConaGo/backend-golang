@@ -12,6 +12,7 @@ require (
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/uuid v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.7 // indirect
 	github.com/temoto/robotstxt v1.1.2 // indirect
