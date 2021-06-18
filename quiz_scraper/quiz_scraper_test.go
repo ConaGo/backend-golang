@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 func TestQuery(t *testing.T) {
-	GetQuizzez()
+	GetQuizzes()
 	//RequestQuiz()
 	
 }

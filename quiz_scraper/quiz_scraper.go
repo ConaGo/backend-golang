@@ -38,7 +38,7 @@ type Response struct {
 	ResponseCode	int 				`bson:"response_code"`
 	Results 		[]Question
 }
-func GetQuizzez() {
+func GetQuizzes() {
 	godotenv.Load("../.env")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_URI")))
