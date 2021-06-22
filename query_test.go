@@ -1,17 +1,8 @@
 package main
 
-import (
-	"fmt"
-	"testing"
-	"time"
+/* func TestQuery(t *testing.T) {
 
-	"conago.de/web-scraper/data_parser"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-)
-func TestQuery(t *testing.T) {
-
-	db, err := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("../data/test.db"), &gorm.Config{})
 	if err != nil {
 		t.Log("failed to connect database")
 	}
@@ -25,7 +16,7 @@ func TestQuery(t *testing.T) {
 		fmt.Println(c.Tags)
 		if len(c.Tags) > 0 {
 			conferences_ = append(conferences_, c)
-		} 
+		}
 	}
 	fmt.Println(len(conferences_))
 	for _, t:= range tags {
@@ -36,11 +27,12 @@ func TestQuery(t *testing.T) {
 					if c1.Name == c2.Name {
 						fmt.Print("Duplicate")
 					}
-		
+
 				}
 				}
 
-			} 
+			}
 
 	}
 }
+*/

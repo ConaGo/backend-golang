@@ -19,7 +19,7 @@ type DBT struct {
 var QuizDB DBT
 //This function opens a connection to the remote mongoDB hosted on MongoAtlas
 func init() {
-	godotenv.Load("../.env")
+	godotenv.Load(".env")
 	// Set client options
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URI"))
 

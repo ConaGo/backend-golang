@@ -3,7 +3,9 @@ package server
 import (
 	"testing"
 )
-func TestQuery(t *testing.T) {
+
+//go test ./server/ -run TestQuestion -v
+func TestQuestion(t *testing.T) {
 	Test()
 	
 }

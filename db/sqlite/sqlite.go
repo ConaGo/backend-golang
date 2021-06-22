@@ -4,11 +4,12 @@ package sqlite
 //it allows the connection to be reused in different goroutines
 import (
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
 type DBT struct {
     DB *gorm.DB
 }
@@ -18,12 +19,13 @@ var TokenDB DBT
 
 //opens two connections to the sqlite databases and exposes the connection
 func init() {
-    dbC, errC := gorm.Open(sqlite.Open("../data/test.db"), &gorm.Config{})
+    godotenv.Load(".env")
+    dbC, errC := gorm.Open(sqlite.Open(os.Getenv("CONFERENCEDB_PATH")), &gorm.Config{})
     if errC != nil {
         log.Fatal("Failed to init test db:", errC)
     }
     ConfDB = DBT{DB: dbC}
-    dbT, errT := gorm.Open(sqlite.Open("../data/quizToken.db"), &gorm.Config{})
+    dbT, errT := gorm.Open(sqlite.Open("TOKENDB_PATH"), &gorm.Config{})
     if errT != nil {
         log.Fatal("Failed to init quizToken db:", errT)
     }
