@@ -1,18 +1,59 @@
 package server
 
 import (
+	"context"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 )
 const (
 	layoutISO = "2006-01-02"
 )
-func StartServer(){
-	http.HandleFunc("/", Serve)
-	http.ListenAndServe(":8080", nil)
-}
+var server *http.Server
+var httpServerExitDone *sync.WaitGroup
 
+func StartServer(){
+    log.Printf("main: starting HTTP server")
+
+    httpServerExitDone = &sync.WaitGroup{}
+
+    httpServerExitDone.Add(1)
+    server = startHttpServer(httpServerExitDone)	
+}
+func StopServer() {
+    log.Printf("main: stopping HTTP server")
+    if server == nil {
+        log.Printf("no active server found")
+        return
+    }
+    if err := server.Shutdown(context.TODO()); err != nil {
+        panic(err) 
+    }
+    // wait for goroutine started in startHttpServer() to stop
+    httpServerExitDone.Wait()
+
+    log.Printf("main: done. exiting")
+}
+func startHttpServer(wg *sync.WaitGroup) *http.Server {
+    srv := &http.Server{Addr: ":8080"}
+
+    http.HandleFunc("/", Serve)
+
+    go func() {
+        defer wg.Done() // let main know we are done cleaning up
+
+        // always returns error. ErrServerClosed on graceful close
+        if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+            // unexpected error. port in use?
+            log.Fatalf("ListenAndServe(): %v", err)
+        }
+    }()
+
+    // returning reference so caller can call Shutdown()
+    return srv
+}
 func Serve(w http.ResponseWriter, r *http.Request) {
 /* 	//https://golang.org/pkg/time/#example_Tick
 	t := time.Tick(30 * time.Minute)
@@ -20,8 +61,6 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%v %s\n", next, statusUpdate())
 	} */
 	var h http.Handler
-/* 	http.HandleFunc("/conferences", HandleConferences)
-	http.HandleFunc("/questions", HandleQuestions) */
 	
 	p := r.URL.Path
     switch {

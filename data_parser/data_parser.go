@@ -79,8 +79,8 @@ type Tag struct {
 	c.UUID = uuid.New()
 	return nil
   } */
-func ParseData() {
-	db, err := gorm.Open(sqlite.Open("./data/test.db"), &gorm.Config{})
+func ParseData(dbPath string) {
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -88,10 +88,6 @@ func ParseData() {
 	db.AutoMigrate((&Tag{}))
 	datas := readConferenceData()
 	db.Create(&datas)
-	var conferences []Conference
-	for _, elem := range conferences {
-		fmt.Println(elem.Name, elem.City)
-	}
 }
 
 
