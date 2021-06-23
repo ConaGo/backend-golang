@@ -14,6 +14,11 @@ const (
 var server *http.Server
 var httpServerExitDone *sync.WaitGroup
 
+func Start(){
+    http.HandleFunc("/", Serve)
+    http.ListenAndServe(":8080", nil)
+}
+
 func StartServer(){
     log.Printf("main: starting HTTP server")
 
@@ -28,7 +33,7 @@ func StopServer() {
         log.Printf("no active server found")
         return
     }
-    if err := server.Shutdown(context.TODO()); err != nil {
+    if err := server.Shutdown(context.Background()); err != nil {
         panic(err) 
     }
     // wait for goroutine started in startHttpServer() to stop

@@ -102,7 +102,7 @@ func readConferenceData() []*Conference {
 		if info.IsDir() {
 			currentDir = info.Name()
 			fmt.Printf("directory name: %s\n", currentDir)
-		} else if currentDir == "2022" || currentDir == "2021" {
+		} else if currentDir == "2022"{
 			path := rootPath + "/" + currentDir + "/" + info.Name()
 			fmt.Println(path)
 			jsonFile, e := os.Open(path)

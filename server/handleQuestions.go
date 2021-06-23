@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"conago.de/myutil"
 	mongodb "conago.de/web-scraper/db/mongo"
 	sqlitedb "conago.de/web-scraper/db/sqlite"
 	"github.com/google/uuid"
@@ -25,14 +26,17 @@ func HandleQuestions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	//parse parametes amount & token
+	//parse parametes amount & token & difficulty
 	params := r.URL.Query()
 	amount, err := strconv.Atoi(params.Get("amount"))
 	if err != nil || amount < 1 || amount > 50 {
 		amount = 10
 	}
 	tokenParam := params.Get("token")
-
+	difficulty := params.Get("difficulty")
+	if !myutil.StringInSlice(difficulty, []string{"easy", "medium", "hard"}) {
+		difficulty = ""
+	}
 	//if a token is sent, prepare the query to filter questions that were already sent to this client
 	amountStage :=  bson.D{{"$sample",bson.D{{"size",amount}}}}
 	pipeline := mongo.Pipeline{amountStage}
@@ -50,8 +54,7 @@ func HandleQuestions(w http.ResponseWriter, r *http.Request) {
 			pipeline = mongo.Pipeline{tokenStage, amountStage}
 			fmt.Println("added")
 		} 
-	}
-	
+	}	
 
 	opts := options.Aggregate().SetMaxTime(2 * time.Second)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -69,11 +72,6 @@ func HandleQuestions(w http.ResponseWriter, r *http.Request) {
 		for _, result := range results {
 			fmt.Printf("name %v\n", result["_id"])
 			ids = append(ids, result["_id"].(primitive.ObjectID).Hex())	
-			/* for _, e := range oids {
-				if result["_id"].(primitive.ObjectID).Hex() == e.Hex() {
-					fmt.Println("NOOOOOO")
-				}
-			} */
 		}
 		var token = Token{}
 		var questions []Question
@@ -81,10 +79,6 @@ func HandleQuestions(w http.ResponseWriter, r *http.Request) {
 		sqlitedb.TokenDB.DB.Find(&questions, "mongo_id IN (?)", ids)
 		sqlitedb.TokenDB.DB.Model(&token).Association("QuestionIDs").Append(&questions)		
 	}
-
-
-
-
 	response, err := json.Marshal(results)
 	w.Write(response)
 }
@@ -121,16 +115,7 @@ func Test() {
 		
 	}
 	sqlitedb.TokenDB.DB.Create(&questions)
-
-
-
-/* 	questions := []Question{}
-	sqlitedb.TokenDB.DB.Find(&questions)
-	fmt.Println(questions) */
 }
-
-
-
 func HandleTokens(w http.ResponseWriter, r *http.Request){
 	id := uuid.New()
 	sqlitedb.TokenDB.DB.Create(&Token{Token:id.String()})

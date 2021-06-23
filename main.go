@@ -1,9 +1,12 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
+	"conago.de/web-scraper/recurring_tasks"
 	"conago.de/web-scraper/server"
 )
 
@@ -17,6 +20,18 @@ var (
 func main() {
 	//html_parser.Test()
 	//data_parser.ParseData()
-	server.StartServer()
-	//recurring_tasks.GetConferenceData()
+	if len(os.Args) >1 &&os.Args[1] == "first"{
+		recurring_tasks.GetConferenceData()
+	}
+
+	go doTask()
+	server.Start()
+
+
+
+}
+func doTask() {
+	time.Sleep(60*time.Second)
+	recurring_tasks.GetConferenceData()
+	os.Exit(0)
 }

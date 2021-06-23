@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
+	"conago.de/web-scraper/data_parser"
 )
 
 func Init() {
@@ -35,7 +37,7 @@ func GetConferenceData() {
 	newDB, err := os.Create("data/tmp.db")
 	check(err)
 	fmt.Println(newDB)
-	//data_parser.ParseData("data/tmp.db")
+	data_parser.ParseData("data/tmp.db")
 	
 	//swap out the temp db with the actual db
 	//server.StopServer()
