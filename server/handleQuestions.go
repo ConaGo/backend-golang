@@ -19,7 +19,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 )
-
+func init() {
+	sqlitedb.TokenDB.DB.AutoMigrate((&Token{}))
+	sqlitedb.TokenDB.DB.AutoMigrate((&Question{}))
+}
 
 func HandleQuestions(w http.ResponseWriter, r *http.Request) {
 	//CORS - remove
